@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Image Rotation Algorithm</title>
+  </head>
+  <body>
+    <!--CARD-->
+    <div class="container">
+      <div class="card card-body teal lighten-2 text-center py-5">
+        <h2>IMAGE ROTATION</h2>
+      </div>
+
+      <br />
+
+      
+      <div class="row">
+        <form class="col s12" id="imageDatas"  onsubmit="formSubmit()" >
+          <div class="row">
+            <div class="input-field col s6">
+              <input id="buffer" name="buffer" required type="number" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==4) return false;" class="validate">
+              <label for="buffer">Buffer</label>
+            </div>
+            <div class="input-field col s6">
+              <input id="width" name="width" required type="number" class="validate">
+              <label for="width">Width</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s6">
+              <input id="height" name="height" required type="number" class="validate">
+              <label for="height">Height</label>
+            </div>
+            <div class="input-field col s6">
+              <input id="angle" name="angle" required type="number" class="validate">
+              <label for="angle">Angle</label>
+            </div>
+          </div>
+          <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+            <i class="material-icons right">send</i>
+          </button>
+        </form>
+       
+      </div>
+      <canvas id="canvas"></canvas>
+        </div>
+        
+    
+
+      <br />
+    </div>
+    <br />
+
+    <script src="js/script.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+      integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  </body>
+</html>
