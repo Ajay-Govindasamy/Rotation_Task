@@ -29,21 +29,29 @@
         <form class="col s12" id="imageDatas"  onsubmit="formSubmit()" >
           <div class="row">
             <div class="input-field col s6">
-              <input id="buffer" name="buffer" required type="number" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==4) return false;" class="validate">
+              <input id="buffer" min="0" name="buffer" pattern="\d*" required type="number" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==4) return false;" class="validate"  oninvalid="this.setCustomValidity('Enter Buffer Value')"
+              oninput="this.setCustomValidity('')" onchange="validateField(this);">
               <label for="buffer">Buffer</label>
+              <p id="bufferError" class="error-message-color"></p>
             </div>
             <div class="input-field col s6">
-              <input id="width" name="width" required type="number" class="validate">
+              <input id="width" min="0" name="width" required type="number" class="validate" oninvalid="this.setCustomValidity('Enter Width')"
+              oninput="this.setCustomValidity('')" onchange="validateField(this);">
               <label for="width">Width</label>
+              <p id="widthError" class="error-message-color"></p>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s6">
-              <input id="height" name="height" required type="number" class="validate">
+              <input id="height" min="0" name="height" required type="number" class="validate" oninvalid="this.setCustomValidity('Enter Height')"
+              oninput="this.setCustomValidity('')" onchange="validateField(this);">
+              <p id="heightError" class="error-message-color"></p>
               <label for="height">Height</label>
             </div>
             <div class="input-field col s6">
-              <input id="angle" name="angle" required type="number" class="validate">
+              <input id="angle" min="0" name="angle" required type="number" min="0" max="360" class="validate" oninvalid="this.setCustomValidity('Enter Rotation Value')"
+              oninput="this.setCustomValidity('')" onchange="validateField(this);">
+              <p id="angleError" class="error-message-color"></p>
               <label for="angle">Angle</label>
             </div>
           </div>
