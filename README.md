@@ -4,13 +4,13 @@ The project structure is divided into two parts.
 2. backend - contains the Rotator class which can be accessed directly from the browser or through REST API call to Node server.
 
 Technologies Used:
-HTML5, CSS3 ,ES6 JavaScript, NodeJS, AWS Lambda, AWS CloudWatch.
-
+HTML5, CSS3 ,ES6 JavaScript, NodeJS, AWS API Gateway, AWS Lambda, AWS CloudWatch.
 The Application can be accessed/tested from the below link,
 
-Deployed in GitHub - Link: https://ajay-govindasamy.github.io/Rotation_Task/
+Deployed in GitHub pages - Link: https://ajay-govindasamy.github.io/Rotation_Task/
 
 • Validation checks for the inputs are added both in browser and server level. Documented the code using JSDoc comments
+
 TWO SOLUTIONS:
 
 • index.html is the start point of the application
