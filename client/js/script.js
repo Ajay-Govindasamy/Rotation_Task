@@ -37,7 +37,7 @@ function readImageData(e) {
 }
 
 /**
- * @description Solution 1- onclick of 'Rotate' button to execute the rotate algorithm Logic
+ * @description SOLUTION 1- onclick of 'Rotate' button to execute the rotate algorithm Logic
  */
 function rotateImageMethodOne(event) {
   event.preventDefault();
@@ -107,13 +107,15 @@ function rotateImageMethodOne(event) {
 }
 
 /**
- * @description Solution 2- onclick of 'Rotate' button to execute the rotate algorithm Logic
+ * @description SOLUTION 2- onclick of 'Rotate' button to execute the rotate algorithm Logic through Node REST API call
+ * added async/await to process the response JSON from the endpoint
  */
 function fetchRotateAPIcallMethodTwo(event) {
   event.preventDefault();
   const apiEndPoint =
     'https://ilw1b2437a.execute-api.us-east-1.amazonaws.com/production/imageRotate';
   document.getElementById('loader').classList.remove('hide');
+
   let timeOut = setTimeout(async function () {
     let originalImageCanvas = document.getElementById('originalImageCanvas');
     let imageDataOriginal = originalImageCanvas.getContext('2d');
@@ -187,7 +189,6 @@ function fetchRotateAPIcallMethodTwo(event) {
       document.getElementById('loader').classList.add('hide');
       clearTimeout(timeOut);
     }
-
     document.getElementById('loader').classList.add('hide');
     clearTimeout(timeOut);
   }, 100);
