@@ -1,6 +1,10 @@
 const NINETY_IN_RADIAN = 1.5708;
 const THREE_SIXTY_IN_RADIAN = 6.28319;
 
+/**
+ * Referenced this algorithm from open source code
+ * https://github.com/gabrielschade/ImageRotator
+ */
 class Rotator {
   rotate(image, angle) {
     //converts degrees to radian to measure the arc length of the distance travellled in circular motion
@@ -9,25 +13,52 @@ class Rotator {
     //validating the input parameters
     if (this.validateInputs(image, angle)) throw new TypeError();
 
+    //Step 1: Imagedata to pixel square matrix to avoid image resizze issues
     let matrix = this.obtainImagePixelMatrix(image);
 
-    let [scaledMatrix, widthIncreased, heightIncreased] = this.scaleMatrix(
-      matrix,
-      angle
-    );
+    //Step 2: Scale the pixel matrix to the rotation angle specified using triange properties
+    let [
+      scaledMatrix,
+      widthIncreased,
+      heightIncreased,
+    ] = this.scaleMatrixRotation(matrix, angle);
 
-    let rotatedMatrix = this.rotateMatrix(
+    //Step 3: Rotate the matrix around the central point using transpositional matrix in linear algebra
+    let rotatedMatrix = this.rotateMatrixAlgorithm(
       scaledMatrix,
       widthIncreased,
       heightIncreased,
       angle
     );
 
-    let antialiasedMatrix = this.antialiasing(rotatedMatrix);
+    //Step 4: Enhance the result by filling up the empty pixel gaps
+    let antialiasedMatrix = this.antialiasingNearByPixels(rotatedMatrix);
 
-    return this.createNewImageArray(antialiasedMatrix);
+    //Step 5: Creates a new Array object of the converted image
+    return this.createConvertedImageArray(antialiasedMatrix);
   }
 
+  /**
+   *
+   * @param {ImageData} image validates if the imageData is undefined or not
+   * @param {Number} angle validates the rotation angle is valid
+   */
+  validateInputs(image, angle) {
+    return (
+      typeof image !== 'object' ||
+      !image.data ||
+      !image.height ||
+      !image.width ||
+      typeof angle !== 'number' ||
+      angle < 0 ||
+      angle > THREE_SIXTY_IN_RADIAN
+    );
+  }
+
+  /**
+   *
+   * @param {ImageData} image creates a square pixel matrix
+   */
   obtainImagePixelMatrix(image) {
     let height = image.height;
     let width = image.width;
@@ -50,7 +81,7 @@ class Rotator {
     for (let row = heightIncreased; row < height; row++) {
       for (let column = widthIncreased; column < width; column++) {
         if (index >= image.data.length) {
-          matrix[row][column] = Pixel.transparentPixel();
+          matrix[row][column] = Pixel.blackTransparentPixel();
         } else {
           matrix[row][column] = new Pixel(image.data, index);
           index += 4;
@@ -67,15 +98,15 @@ class Rotator {
    * @returns Returns an array (size 3) containing the new Pixel matrix with different sizes than the original image,
    * The quantity of Pixels that the image increase horizontally and vertically, respectivelly
    */
-  scaleMatrix(matrix, angle) {
+  scaleMatrixRotation(matrix, angle) {
     let height = matrix.length;
     let width = matrix[0].length;
     let [newWidth, newHeight] = this.getImageSize(width, height, angle);
     let heightIncreased = parseInt((newHeight - height) / 2);
     let widthIncreased = parseInt((newWidth - width) / 2);
     let scaledMatrix = Array(newHeight)
-      .fill(Pixel.transparentPixel())
-      .map(() => Array(newWidth).fill(Pixel.transparentPixel()));
+      .fill(Pixel.blackTransparentPixel())
+      .map(() => Array(newWidth).fill(Pixel.blackTransparentPixel()));
 
     for (let row = heightIncreased; row < height + heightIncreased; row++) {
       for (
@@ -98,13 +129,13 @@ class Rotator {
    * @param {Number} angle Angle in Radians to rotate the image
    * @returns A new Pixel matrix rotated by the given angle
    */
-  rotateMatrix(matrix, widthIncreased, heightIncreased, angle) {
+  rotateMatrixAlgorithm(matrix, widthIncreased, heightIncreased, angle) {
     let height = matrix.length;
     let width = matrix[0].length;
 
     let rotatedMatrix = Array(height)
-      .fill(Pixel.transparentPixel())
-      .map(() => Array(width).fill(Pixel.transparentPixel()));
+      .fill(Pixel.blackTransparentPixel())
+      .map(() => Array(width).fill(Pixel.blackTransparentPixel()));
 
     let centralRow = parseInt(height / 2);
     let centralColumn = parseInt(width / 2);
@@ -135,12 +166,12 @@ class Rotator {
    * @param {Pixel[][]} matrix Image Pixel matrix to scale to according the angle
    * @returns Returns a new Pixel image after the antialiasing process.
    */
-  antialiasing(matrix) {
+  antialiasingNearByPixels(matrix) {
     for (let row = 0; row < matrix.length; row++) {
       for (let column = 0; column < matrix[0].length; column++) {
         let pixel = matrix[row][column];
         if (Pixel.isTransparentOrInvalid(pixel)) {
-          pixel = Pixel.antialiasing(matrix, row, column);
+          pixel = Pixel.antialiasingNearByPixels(matrix, row, column);
         }
         matrix[row][column] = pixel;
       }
@@ -153,7 +184,7 @@ class Rotator {
    * @returns Returns a new ImageData object based on the given Pixel matrix.
    * @param {Pixel[][]} antialisedMatrix Image Pixel matrix to convert to a new image data array.
    */
-  createNewImageArray(antialisedMatrix) {
+  createConvertedImageArray(antialisedMatrix) {
     const newimageData = {
       width: antialisedMatrix.length,
       height: antialisedMatrix[0].length,
@@ -168,25 +199,13 @@ class Rotator {
     return newimageData;
   }
 
-  validateInputs(image, angle) {
-    return (
-      typeof image !== 'object' ||
-      !image.data ||
-      !image.height ||
-      !image.width ||
-      typeof angle !== 'number' ||
-      angle < 0 ||
-      angle > THREE_SIXTY_IN_RADIAN
-    );
-  }
-
   /**
    * @description Apply the operations Round and Absolute in a given number.
    * @summary e.g. (-1.6) -> 2 || (2.1) -> 2 || (-2) -> 2
    * @param {Number} number Number to be normalized (Rounded + Absolute)
    * @returns Returns the absolute rounded number according the given parameter
    */
-  normalizeNumber(number) {
+  roundingToObsoluteNumber(number) {
     return Math.abs(Math.round(number));
   }
 
@@ -212,7 +231,10 @@ class Rotator {
     newWidth = width * cos + height * sin;
     newHeight = width * sin + height * cos;
 
-    return [this.normalizeNumber(newWidth), this.normalizeNumber(newHeight)];
+    return [
+      this.roundingToObsoluteNumber(newWidth),
+      this.roundingToObsoluteNumber(newHeight),
+    ];
   }
 
   /**
@@ -233,7 +255,10 @@ class Rotator {
         cos * (column - centralColumn) -
         sin * (row - centralRow) +
         centralColumn;
-    return [this.normalizeNumber(newX), this.normalizeNumber(newY)];
+    return [
+      this.roundingToObsoluteNumber(newX),
+      this.roundingToObsoluteNumber(newY),
+    ];
   }
 
   /**
@@ -260,7 +285,7 @@ class Rotator {
         if (pixel) {
           this.pushPixel(dataArray, pixel);
         } else {
-          this.pushPixel(dataArray, Pixel.transparentPixel());
+          this.pushPixel(dataArray, Pixel.blackTransparentPixel());
         }
       }
     }
@@ -276,7 +301,6 @@ class Pixel {
   /**
    * @param {array} data representing a one-dimensional array containing the data in the RGBA order, with integer values between 0 and 255 (inclusive).
    * @param {number} index representing an index (positive integer) used to extract the Pixel from the given data array.
-   * @throws {RangeError} Throws RangeError when the index or data array were invalid.
    */
   constructor(data, index) {
     if (index < 0 || index > data.length) throw new RangeError();
@@ -287,44 +311,35 @@ class Pixel {
   }
 
   /**
-   * @description Gets the RED value (an integer value between 0 and 255, inclusive).
+   * @description Gets the RED value
    */
   get r() {
     return this._r;
   }
 
   /**
-   * @description Gets the GREEN value (an integer value between 0 and 255, inclusive).
+   * @description Gets the GREEN value
    */
   get g() {
     return this._g;
   }
 
   /**
-   * @description Gets the BLUE value (an integer value between 0 and 255, inclusive).
+   * @description Gets the BLUE value
    */
   get b() {
     return this._b;
   }
 
   /**
-   * @description Gets the ALPHA value (an integer value between 0 and 255, inclusive).
+   * @description Gets the ALPHA value
    */
   get a() {
     return this._a;
   }
 
   /**
-   * @description Creates a new black pixel transparent (ALPHA = 0)
-   * @returns new instance of a transparent pixel
-   */
-  static transparentPixel() {
-    return new Pixel([0, 0, 0, 0], 0);
-  }
-
-  /**
    * @description Check the if the given pixel is undefined or transparent.
-   * @param {Pixel} pixel Represents the pixel to test.
    * @returns Returns true when the pixel is undefined or when the pixel alpha is equals to zero, otherwise returns false;
    */
   static isTransparentOrInvalid(pixel) {
@@ -332,19 +347,10 @@ class Pixel {
   }
 
   /**
-   * @description Check if the given pixel is out of the bounds of the image matrix
-   * @param {Pixel[][]} matrix Pixel matrix that represents the image
-   * @param {Number} neighborRow Row index (positive integer) of the adjacent pixel to check
-   * @param {Number} neighborColumn Column index (positive integer) of the adjacent pixel to check
-   * @returns Returns true when one of the indexes are out of the bounds of the matrix, otherwise returns false.
+   * @description Creates a new black pixel transparent (ALPHA = 0)
    */
-  static isOutOfBounds(matrix, neighborRow, neighborColumn) {
-    return (
-      neighborRow < 0 ||
-      neighborRow >= matrix.length ||
-      neighborColumn < 0 ||
-      neighborColumn >= matrix[neighborRow].length
-    );
+  static blackTransparentPixel() {
+    return new Pixel([0, 0, 0, 0], 0);
   }
 
   /**
@@ -354,7 +360,7 @@ class Pixel {
    * @param {Number} column Column index (positive integer) of the adjacent pixel to get the neighbors
    * @returns Returns all valid (not transparent nor out of bounds) neighbors for the antialiasing process
    */
-  static getNeighbors(matrix, row, column) {
+  static getNeighborsPixels(matrix, row, column) {
     let neighbors = [];
     for (let neighborRow = row - 1; neighborRow <= row + 1; neighborRow++) {
       for (
@@ -363,7 +369,7 @@ class Pixel {
         neighborColumn++
       ) {
         if (
-          !Pixel.isOutOfBounds(matrix, neighborRow, neighborColumn) &&
+          !Pixel.isPixelOutOfBounds(matrix, neighborRow, neighborColumn) &&
           !(neighborRow == row && neighborColumn == column) &&
           !Pixel.isTransparentOrInvalid(matrix[neighborRow][neighborColumn])
         )
@@ -375,11 +381,27 @@ class Pixel {
   }
 
   /**
+   * @description Check if the given pixel is out of the bounds of the image matrix
+   * @param {Pixel[][]} matrix Pixel matrix that represents the image
+   * @param {Number} neighborRow Row index (positive integer) of the adjacent pixel to check
+   * @param {Number} neighborColumn Column index (positive integer) of the adjacent pixel to check
+   * @returns Returns true when one of the indexes are out of the bounds of the matrix, otherwise returns false.
+   */
+  static isPixelOutOfBounds(matrix, neighborRow, neighborColumn) {
+    return (
+      neighborRow < 0 ||
+      neighborRow >= matrix.length ||
+      neighborColumn < 0 ||
+      neighborColumn >= matrix[neighborRow].length
+    );
+  }
+
+  /**
    * @description Create a new pixel based on the neighborhood
    * @param {Pixel[]} neighbors Adjacent pixels to calculate the average RGB
    * @returns Returns a new instance of Pixel based on the neighborhood.
    */
-  static getAverageRGB(neighbors) {
+  static getAverageRGBpixel(neighbors) {
     let totalR = 0,
       totalG = 0,
       totalB = 0;
@@ -404,19 +426,19 @@ class Pixel {
   /**
    * @description Create a new pixel based on the average of the neighbors pixels.
    * @param {Pixel[][]} matrix Pixel matrix that represents the image
-   * @param {Number} row Row index (positive integer) of the pixel to apply the antialiasing process
-   * @param {Number} column Column index (positive integer)of the pixel to apply the antialiasing process
+   * @param {Number} row Row index (positive integer) of the pixel to apply the antialiasingNearByPixels process
+   * @param {Number} column Column index (positive integer)of the pixel to apply the antialiasingNearByPixels process
    * @returns a new Pixel based on its neighbors
    * @throws {RangeError} Throws RangeError when the row or column are invalid matrix indexes.
    */
-  static antialiasing(matrix, row, column) {
-    if (Pixel.isOutOfBounds(matrix, row, column)) throw new RangeError();
+  static antialiasingNearByPixels(matrix, row, column) {
+    if (Pixel.isPixelOutOfBounds(matrix, row, column)) throw new RangeError();
 
     let pixel = matrix[row][column];
-    let neighbors = Pixel.getNeighbors(matrix, row, column);
+    let neighbors = Pixel.getNeighborsPixels(matrix, row, column);
 
     if (neighbors.length > 3) {
-      pixel = Pixel.getAverageRGB(neighbors);
+      pixel = Pixel.getAverageRGBpixel(neighbors);
     }
 
     return pixel;

@@ -1,6 +1,6 @@
 /**
  * validating Input Fields to check if the entered data is valid or not before processing it
- * @param {*} fieldObject validates the input field angle from the User Interface
+ * @param {*} fieldObject validates the input field angle(degrees) from the User Interface
  */
 function validateField(fieldObject) {
   fieldObject.value > 0 && fieldObject.value <= 360
@@ -37,9 +37,10 @@ function readImageData(e) {
 }
 
 /**
- * @description onclick of 'Rotate' button to execute the rotate algorithm Logic
+ * @description Solution 1- onclick of 'Rotate' button to execute the rotate algorithm Logic
  */
-function rotateImageMethodOne() {
+function rotateImageMethodOne(event) {
+  event.preventDefault();
   document.getElementById('loader').classList.remove('hide');
   let timeOut = setTimeout(function () {
     let originalImageCanvas = document.getElementById('originalImageCanvas');
@@ -56,7 +57,7 @@ function rotateImageMethodOne() {
         image.height
       );
       let result = currentImage;
-
+      console.log(currentImage);
       //Testing the algorithm's performance
       var startTime;
       var endTime;
@@ -64,6 +65,8 @@ function rotateImageMethodOne() {
       result = rotator.rotate(currentImage, angle);
       endTime = performance.now();
       let timeTaken = endTime - startTime;
+      let memoryInfo = performance.memory;
+      console.log(memoryInfo);
 
       const newimageData = imageDataConverted.createImageData(
         result.width,
@@ -77,7 +80,7 @@ function rotateImageMethodOne() {
       convertedImageCanvas.height = newimageData.height;
 
       imageDataConverted.putImageData(newimageData, 0, 0);
-
+      evaluateImageQuality();
       const options = {
         style: {
           main: {
@@ -104,9 +107,12 @@ function rotateImageMethodOne() {
 }
 
 /**
- * @description onclick of 'Rotate' button to execute the rotate algorithm Logic
+ * @description Solution 2- onclick of 'Rotate' button to execute the rotate algorithm Logic
  */
-function fetchRotateAPIcallMethodTwo() {
+function fetchRotateAPIcallMethodTwo(event) {
+  event.preventDefault();
+  const apiEndPoint =
+    'https://ilw1b2437a.execute-api.us-east-1.amazonaws.com/production/imageRotate';
   document.getElementById('loader').classList.remove('hide');
   let timeOut = setTimeout(async function () {
     let originalImageCanvas = document.getElementById('originalImageCanvas');
@@ -130,7 +136,6 @@ function fetchRotateAPIcallMethodTwo() {
         data,
       }))(currentImage);
 
-      const apiUrl = 'http://localhost:3000/imageRotate';
       let _data = {
         image: imageData,
         angle: angle,
@@ -139,7 +144,7 @@ function fetchRotateAPIcallMethodTwo() {
       var startTime;
       var endTime;
       startTime = performance.now();
-      const response = await fetch(apiUrl, {
+      const response = await fetch(apiEndPoint, {
         method: 'POST',
         body: JSON.stringify(_data),
         headers: { 'Content-type': 'application/json; charset=UTF-8' },
@@ -161,6 +166,7 @@ function fetchRotateAPIcallMethodTwo() {
         convertedImageCanvas.height = newimageData.height;
 
         imageDataConverted.putImageData(newimageData, 0, 0);
+        evaluateImageQuality();
         const options = {
           style: {
             main: {
@@ -187,12 +193,32 @@ function fetchRotateAPIcallMethodTwo() {
   }, 100);
 }
 
+/** Calculating Image sizes and resolution Metrics */
+evaluateImageQuality = () => {
+  let originalImageCanvas = document.getElementById('originalImageCanvas');
+  let convertedImageCanvas = document.getElementById('convertedImageCanvas');
+  const originalSize = Math.round(
+    originalImageCanvas.toDataURL('image/jpeg').length
+  );
+  const origResolution =
+    originalImageCanvas.width + 'x' + originalImageCanvas.height;
+  const convImageSize = Math.round(
+    convertedImageCanvas.toDataURL('image/jpeg').length
+  );
+  const convResolution =
+    convertedImageCanvas.width + 'x' + convertedImageCanvas.height;
+
+  document.getElementById(
+    'OrigImgTitle'
+  ).innerHTML = `Original Image:\n size(${originalSize}  KB)  Resolution: (${origResolution})`;
+  document.getElementById(
+    'RotImgTitle'
+  ).innerHTML = `Rotated Image:\n size(${convImageSize} KB) Resolution: (${convResolution})`;
+};
+
 //anonymous IIFE function that runs automatically when the script is loaded initially without any explicit invoke.
 (function () {
   document
     .getElementById('fileId')
     .addEventListener('change', readImageData, false);
-  document
-    .getElementById('rotateButton')
-    .addEventListener('click', fetchRotateAPIcallMethodTwo);
 })();
