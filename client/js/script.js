@@ -41,128 +41,43 @@ function readImageData(e) {
  */
 function rotateImageMethodOne(event) {
   event.preventDefault();
-  document.getElementById('loader').classList.remove('hide');
-  let timeOut = setTimeout(function () {
-    let originalImageCanvas = document.getElementById('originalImageCanvas');
-    let imageDataOriginal = originalImageCanvas.getContext('2d');
-    let convertedImageCanvas = document.getElementById('convertedImageCanvas');
-    let imageDataConverted = convertedImageCanvas.getContext('2d');
-    let angle = parseFloat(document.getElementById('angle').value);
-    let currentImage = null;
-    try {
-      currentImage = imageDataOriginal.getImageData(
-        0,
-        0,
-        image.width,
-        image.height
+  if (isFileSizeValid()) {
+    document.getElementById('loader').classList.remove('hide');
+    let timeOut = setTimeout(function () {
+      let originalImageCanvas = document.getElementById('originalImageCanvas');
+      let imageDataOriginal = originalImageCanvas.getContext('2d');
+      let convertedImageCanvas = document.getElementById(
+        'convertedImageCanvas'
       );
-      let result = currentImage;
-      console.log(currentImage);
-      //Testing the algorithm's performance
-      var startTime;
-      var endTime;
-      startTime = performance.now();
-      result = rotator.rotate(currentImage, angle);
-      endTime = performance.now();
-      let timeTaken = endTime - startTime;
-      let memoryInfo = performance.memory;
-      console.log(memoryInfo);
-
-      const newimageData = imageDataConverted.createImageData(
-        result.width,
-        result.height
-      );
-
-      for (let i = 0; i < newimageData.data.length; i++)
-        newimageData.data[i] = result.data[i];
-
-      convertedImageCanvas.width = newimageData.width;
-      convertedImageCanvas.height = newimageData.height;
-
-      imageDataConverted.putImageData(newimageData, 0, 0);
-      evaluateImageQuality();
-      const options = {
-        style: {
-          main: {
-            background: '#27ae60',
-            color: '#fff',
-          },
-        },
-      };
-      iqwerty.toast.toast(
-        'Image Rotation Algorithm took ' + `${timeTaken}` + ' milliseconds',
-        options
-      );
-    } catch (error) {
-      M.toast({
-        html: 'Oops, something went wrong. Please check your inputs.',
-      });
-      document.getElementById('loader').classList.add('hide');
-      clearTimeout(timeOut);
-    }
-
-    document.getElementById('loader').classList.add('hide');
-    clearTimeout(timeOut);
-  }, 100);
-}
-
-/**
- * @description SOLUTION 2- onclick of 'Rotate' button to execute the rotate algorithm Logic through Node REST API call
- * added async/await to process the response JSON from the endpoint
- */
-function fetchRotateAPIcallMethodTwo(event) {
-  event.preventDefault();
-  const apiEndPoint =
-    'https://ilw1b2437a.execute-api.us-east-1.amazonaws.com/production/imageRotate';
-  document.getElementById('loader').classList.remove('hide');
-
-  let timeOut = setTimeout(async function () {
-    let originalImageCanvas = document.getElementById('originalImageCanvas');
-    let imageDataOriginal = originalImageCanvas.getContext('2d');
-    let convertedImageCanvas = document.getElementById('convertedImageCanvas');
-    let imageDataConverted = convertedImageCanvas.getContext('2d');
-    let angle = parseFloat(document.getElementById('angle').value);
-    let currentImage = null;
-
-    try {
-      currentImage = imageDataOriginal.getImageData(
-        0,
-        0,
-        image.width,
-        image.height
-      );
-
-      const imageData = (({ width, height, data }) => ({
-        width,
-        height,
-        data,
-      }))(currentImage);
-
-      let _data = {
-        image: imageData,
-        angle: angle,
-      };
-
-      var startTime;
-      var endTime;
-      startTime = performance.now();
-      const response = await fetch(apiEndPoint, {
-        method: 'POST',
-        body: JSON.stringify(_data),
-        headers: { 'Content-type': 'application/json; charset=UTF-8' },
-      });
-
-      if (response.status == 200) {
-        const responseData = await response.json();
+      let imageDataConverted = convertedImageCanvas.getContext('2d');
+      let angle = parseFloat(document.getElementById('angle').value);
+      let currentImage = null;
+      try {
+        currentImage = imageDataOriginal.getImageData(
+          0,
+          0,
+          image.width,
+          image.height
+        );
+        let result = currentImage;
+        console.log(currentImage);
+        //Testing the algorithm's performance
+        var startTime;
+        var endTime;
+        startTime = performance.now();
+        result = rotator.rotate(currentImage, angle);
         endTime = performance.now();
         let timeTaken = endTime - startTime;
+        let memoryInfo = performance.memory;
+        console.log(memoryInfo);
+
         const newimageData = imageDataConverted.createImageData(
-          responseData.width,
-          responseData.height
+          result.width,
+          result.height
         );
 
         for (let i = 0; i < newimageData.data.length; i++)
-          newimageData.data[i] = responseData.data[i];
+          newimageData.data[i] = result.data[i];
 
         convertedImageCanvas.width = newimageData.width;
         convertedImageCanvas.height = newimageData.height;
@@ -181,17 +96,109 @@ function fetchRotateAPIcallMethodTwo(event) {
           'Image Rotation Algorithm took ' + `${timeTaken}` + ' milliseconds',
           options
         );
+      } catch (error) {
+        M.toast({
+          html: 'Oops, something went wrong. Please check your inputs.',
+        });
+        document.getElementById('loader').classList.add('hide');
+        clearTimeout(timeOut);
       }
-    } catch (error) {
-      M.toast({
-        html: 'Oops, something went wrong. Please check your inputs.',
-      });
       document.getElementById('loader').classList.add('hide');
       clearTimeout(timeOut);
-    }
-    document.getElementById('loader').classList.add('hide');
-    clearTimeout(timeOut);
-  }, 100);
+    }, 100);
+  }
+}
+
+/**
+ * @description SOLUTION 2- onclick of 'Rotate' button to execute the rotate algorithm Logic through Node REST API call
+ * added async/await to process the response JSON from the endpoint
+ */
+function fetchRotateAPIcallMethodTwo(event) {
+  event.preventDefault();
+  if (isFileSizeValid()) {
+    const apiEndPoint =
+      'https://ilw1b2437a.execute-api.us-east-1.amazonaws.com/production/imageRotate';
+    document.getElementById('loader').classList.remove('hide');
+
+    let timeOut = setTimeout(async function () {
+      let originalImageCanvas = document.getElementById('originalImageCanvas');
+      let imageDataOriginal = originalImageCanvas.getContext('2d');
+      let convertedImageCanvas = document.getElementById(
+        'convertedImageCanvas'
+      );
+      let imageDataConverted = convertedImageCanvas.getContext('2d');
+      let angle = parseFloat(document.getElementById('angle').value);
+      let currentImage = null;
+
+      try {
+        currentImage = imageDataOriginal.getImageData(
+          0,
+          0,
+          image.width,
+          image.height
+        );
+
+        const imageData = (({ width, height, data }) => ({
+          width,
+          height,
+          data,
+        }))(currentImage);
+
+        let _data = {
+          image: imageData,
+          angle: angle,
+        };
+
+        var startTime;
+        var endTime;
+        startTime = performance.now();
+        const response = await fetch(apiEndPoint, {
+          method: 'POST',
+          body: JSON.stringify(_data),
+          headers: { 'Content-type': 'application/json; charset=UTF-8' },
+        });
+
+        if (response.status == 200) {
+          const responseData = await response.json();
+          endTime = performance.now();
+          let timeTaken = endTime - startTime;
+          const newimageData = imageDataConverted.createImageData(
+            responseData.width,
+            responseData.height
+          );
+
+          for (let i = 0; i < newimageData.data.length; i++)
+            newimageData.data[i] = responseData.data[i];
+
+          convertedImageCanvas.width = newimageData.width;
+          convertedImageCanvas.height = newimageData.height;
+
+          imageDataConverted.putImageData(newimageData, 0, 0);
+          evaluateImageQuality();
+          const options = {
+            style: {
+              main: {
+                background: '#27ae60',
+                color: '#fff',
+              },
+            },
+          };
+          iqwerty.toast.toast(
+            'Image Rotation Algorithm took ' + `${timeTaken}` + ' milliseconds',
+            options
+          );
+        }
+      } catch (error) {
+        M.toast({
+          html: 'Oops, something went wrong. Please check your inputs.',
+        });
+        document.getElementById('loader').classList.add('hide');
+        clearTimeout(timeOut);
+      }
+      document.getElementById('loader').classList.add('hide');
+      clearTimeout(timeOut);
+    }, 100);
+  }
 }
 
 /** Calculating Image sizes and resolution Metrics */
@@ -215,6 +222,22 @@ evaluateImageQuality = () => {
   document.getElementById(
     'RotImgTitle'
   ).innerHTML = `Rotated Image:\n size(${convImageSize} KB) Resolution: (${convResolution})`;
+};
+
+isFileSizeValid = () => {
+  var fileValid = true;
+  let fi = document.getElementById('fileId');
+  if (fi.files.length > 0) {
+    for (let i = 0; i <= fi.files.length - 1; i++) {
+      let fsize = fi.files.item(i).size;
+      let file = Math.round(fsize / 1024);
+      if (file >= 1024) {
+        alert('File too Big, please select a file less than or equal to 1mb');
+        fileValid = false;
+      }
+    }
+  }
+  return fileValid;
 };
 
 //anonymous IIFE function that runs automatically when the script is loaded initially without any explicit invoke.

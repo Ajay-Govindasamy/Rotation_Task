@@ -28,3 +28,5 @@ https://ilw1b2437a.execute-api.us-east-1.amazonaws.com/production/imageRotate
 --> Deployed the AWS lambda function using cloud serverless framework (https://www.serverless.com/)
 
 --> API responses are logged in AWS CloudWatch.
+
+As a security measure, added CORS(Cross Origin Resource Sharing) access to load the resources from the server.
