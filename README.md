@@ -7,6 +7,7 @@ The Application can be accessed/tested from the below link,
 
 site link: https://ajay-govindasamy.github.io/Rotation_Task/
 
+--> Validation checks for the inputs are added both in browser and server level.
 TWO SOLUTIONS:
 
 --> index.html is the start point of the application
