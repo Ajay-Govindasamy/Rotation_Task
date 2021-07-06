@@ -4,7 +4,7 @@ The project structure is divided into two parts.
 2. backend - contains the Rotator class which can be accessed directly from the browser or through REST API call to Node server.
 
 Technologies Used:
-HTML5,CSS3,ES6 JavaScript, NodeJS, AWS Lambda, AWS CloudWatch
+HTML5, CSS3 ,ES6 JavaScript, NodeJS, AWS Lambda, AWS CloudWatch.
 
 The Application can be accessed/tested from the below link,
 
