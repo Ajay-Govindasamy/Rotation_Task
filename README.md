@@ -1,11 +1,14 @@
 The project structure is divided into two parts.
 
 1. client(browser) - Contains the User Interface and styles for the web page.
-2. backend - contains the Rotator class which can be accessed directly from the browser or through REST API call to Node server
+2. backend - contains the Rotator class which can be accessed directly from the browser or through REST API call to Node server.
+
+Technologies Used:
+HTML5,CSS3,ES6 JavaScript, NodeJS, AWS Lambda, AWS CloudWatch
 
 The Application can be accessed/tested from the below link,
 
-site link: https://ajay-govindasamy.github.io/Rotation_Task/
+Deployed in GitHub - Link: https://ajay-govindasamy.github.io/Rotation_Task/
 
 --> Validation checks for the inputs are added both in browser and server level. Documented the code using JSDoc comments
 TWO SOLUTIONS:

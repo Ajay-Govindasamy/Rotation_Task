@@ -13,10 +13,10 @@ class Rotator {
     //validating the input parameters
     if (this.validateInputs(image, angle)) throw new TypeError();
 
-    //Step 1: Imagedata to pixel square matrix to avoid image resizze issues
+    //Step 1: Imagedata to pixel square matrix to avoid image resize issues
     let matrix = this.obtainImagePixelMatrix(image);
 
-    //Step 2: Scale the pixel matrix to the rotation angle specified using triange properties
+    //Step 2: Scale the pixel matrix to the rotation angle specified using triange properties to avoid image resize issues
     let [
       scaledMatrix,
       widthIncreased,
