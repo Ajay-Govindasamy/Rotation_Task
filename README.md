@@ -17,7 +17,7 @@ TWO SOLUTIONS:
 
 As stated in the rules of the requirement 'The class/method must run in node and browser'
 
-The rotate method can be accessed from calling either of the below methods available in client folder --> 'script.js' file,
+The rotate method can be accessed from calling either of the below methods available in client folder --> js--> 'script.js' file,
 
 i) function rotateImageMethodOne(event) - accessing from browser by calling 'Rotator.js' file
 
