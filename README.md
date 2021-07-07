@@ -20,6 +20,7 @@ As stated in the rules of the requirement 'The class/method must run in node and
 The rotate method can be accessed from calling either of the below methods available in client folder --> 'script.js' file,
 
 i) function rotateImageMethodOne(event) - accessing from browser by calling 'Rotator.js' file
+
 ii) function fetchRotateAPIcallMethodTwo(event) - accessing the algorithm from AWS API endpoint (invoked as AWS lambda function using Node server runtime environment)
 
 • Please find the API endpoint access URL below,
